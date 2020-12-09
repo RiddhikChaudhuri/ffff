@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:tx="http://www.springframework.org/schema/tx" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+    xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/tx    http://www.springframework.org/schema/tx/spring-tx.xsd
+          http://www.springframework.org/schema/context    http://www.springframework.org/schema/context/spring-context.xsd
+          http://www.springframework.org/schema/jdbc    http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+          http://www.springframework.org/schema/data/jpa    http://www.springframework.org/schema/data/jpa/spring-jpa.xsd"
+    >
+    
+    <context:component-scan base-package="com.olp"/>
+    
+    <!--context:annotation-config/-->
+    
+    <tx:annotation-driven />
+
+    <!--jpa:repositories base-package="com.olp.jpa"  entity-manager-factory-ref="entityManagerFactory"/-->
+    
+    <jpa:repositories base-package="com.olp.jpa" entity-manager-factory-ref="entityManagerFactory" />
+    
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="jpaPropertyMap">
+            <map>
+                <entry key="hibernate.resource.beans.container">
+                    <bean class="org.springframework.orm.hibernate5.SpringBeanContainer"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="h2DataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    
+    <!-- Step 2: Setup Hibernate session factory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="h2DataSource" />
+        <property name="packagesToScan" value="com.olp.jpa" />
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <!-- Step 3: Setup Hibernate transaction manager -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    
+    <context:property-placeholder location="classpath:/jdbc.properties"/>
+    
+</beans>

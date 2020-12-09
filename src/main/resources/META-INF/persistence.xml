@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+	xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="productHub">
+		<provider>org.hibernate.ogm.jpa.HibernateOgmPersistence</provider>
+		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+		<class>com.olp.jpa.domain.docu.um.model.PersonEntity</class>
+		<class>com.olp.jpa.domain.docu.um.model.RoleEntity</class>
+		<class>com.olp.jpa.domain.docu.um.model.UserEntity</class>
+		<class>com.olp.jpa.domain.docu.um.model.UserRoleAsscnEntity</class>
+		<class>com.olp.jpa.common.BaseEntity</class>
+		<class>com.olp.jpa.common.MultiTenantEntity</class>
+		<class>com.olp.jpa.common.MultiTenantLifeCycleEntity</class>
+		<properties>
+			<property name="hibernate.ogm.datastore.provider" value="mongodb"/>
+            <property name="hibernate.ogm.datastore.host" value="127.0.0.1"/>
+            <property name="hibernate.ogm.datastore.port" value="27017"/>
+            <property name="hibernate.ogm.datastore.database" value="hike_db"/>
+            <property name="hibernate.ogm.datastore.create_database" value="true"/>
+            <property name="hibernate.search.default.directory_provider" value="filesystem"/>
+            <property name = "hibernate.show_sql" value = "true" />
+		</properties>
+
+	</persistence-unit>
+
+</persistence>
