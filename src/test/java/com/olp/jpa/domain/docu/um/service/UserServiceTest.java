@@ -61,7 +61,6 @@ public class UserServiceTest extends BaseSpringAwareTest {
     public void test_add() {
         UserEntity user = new UserEntity();
         user.setUserName("abc");
-        user.setTenantId("355242");
         user.setUserType(UmEnums.UserType.BACKOFFICE);
         user.setStatus(LifeCycleStatus.ACTIVE);
         user.setPrimaryEmail("test@trilia.com");

@@ -45,7 +45,6 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @param <T>
  * @param <ID>
  */
-@Repository
+@NoRepositoryBean
 public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Serializable> implements IBaseRepository<T, ID> {
     
     //@Autowired
@@ -81,9 +80,8 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return("0");
     }
     
-    
-    @Transactional(readOnly=true, noRollbackFor={javax.persistence.NoResultException.class})
     @Override
+    @Transactional(readOnly=true, noRollbackFor={javax.persistence.NoResultException.class})
     public List<T> findAll() {
         
         if (__entityManager == null)
@@ -120,9 +118,8 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(list);
     }
 
-    
-    @Transactional(readOnly=true)
     @Override
+    @Transactional(readOnly=true)
     public List<T> findAll(Sort sort) {
         
         if (__entityManager == null)
@@ -159,9 +156,8 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(list);
     }
 
-    
-    @Transactional(readOnly=true)
     @Override
+    @Transactional(readOnly=true)
     public List<T> findAllById(Iterable<ID> itrbl) {
         
         if (__entityManager == null)
@@ -212,32 +208,32 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         
     }
     
-    
+    @Override
     public <S extends T> List<S> findAll(Example<S> exmpl) {
         throw new UnsupportedOperationException("Not yet implemented !");
     }
 
-    
+    @Override
     public <S extends T> List<S> findAll(Example<S> exmpl, Sort sort) {
         throw new UnsupportedOperationException("Not yet implemented !");
     }
     
-    //
+    //@Override
     //public <S extends T> S findOne(Example<S> exmpl) {
     //    throw new UnsupportedOperationException("Not yet implemented !");
     //}
 
-    
+    @Override
     public <S extends T> Page<S> findAll(Example<S> exmpl, Pageable pgbl) {
         throw new UnsupportedOperationException("Not yet implemented !");
     }
 
-    
+    @Override
     public <S extends T> long count(Example<S> exmpl) {
         throw new UnsupportedOperationException("Not yet implemented !");
     }
     
-    
+    @Override
     public <S extends T> boolean exists(Example<S> exmpl) {
         throw new UnsupportedOperationException("Not yet implemented !");
     }
@@ -278,7 +274,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(list);
     }
     
-    
+    @Override
     @Transactional
     public <S extends T> S save(S s) {
         
@@ -307,30 +303,30 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
                         throw new RuntimeException("Could not set the tenant id for this domain object !");
                     }
                 
-                }// else {
-//                    //String clazzStr1 = "com.olp.jpa.domain.docu.be.model.MerchantEntity";
-//                    //String clazzStr2 = "com.olp.jpa.domain.docu.be.model.MerchantWorkflowStatusEntity";
-//                    ClassLoader loader = this.getClass().getClassLoader();
-//                    Class clazz1 = null, clazz2 = null;
-//                    try {
-//                        clazz1 = loader.loadClass(clazzStr1);
-//                    } catch (ClassNotFoundException ex) {
-//                        logger.log(Level.SEVERE, "Could not load class " + clazzStr1, ex);
-//                        throw new RuntimeException("Could not load class " + clazzStr1);
-//                    }
-//                    
-//                    try {
-//                        clazz2 = loader.loadClass(clazzStr2);
-//                    } catch (ClassNotFoundException ex) {
-//                        logger.log(Level.SEVERE, "Could not load class " + clazzStr2, ex);
-//                        throw new RuntimeException("Could not load class " + clazzStr2);
-//                    }
-//                    
-//                    if (!sessionTid.equals(suppliedTid) && !(s.getClass().isAssignableFrom(clazz1) || s.getClass().isAssignableFrom(clazz2))) {
-//                        logger.log(Level.SEVERE, "The session tenant id does not match the supplied tenant id - {0}", suppliedTid);
-//                        throw new RuntimeException("The session tenant id does not match the supplied tenant id - " + suppliedTid);
-//                    }
-//                }
+                } else {
+                    String clazzStr1 = "com.olp.jpa.domain.docu.be.model.MerchantEntity";
+                    String clazzStr2 = "com.olp.jpa.domain.docu.be.model.MerchantWorkflowStatusEntity";
+                    ClassLoader loader = this.getClass().getClassLoader();
+                    Class clazz1 = null, clazz2 = null;
+                    try {
+                        clazz1 = loader.loadClass(clazzStr1);
+                    } catch (ClassNotFoundException ex) {
+                        logger.log(Level.SEVERE, "Could not load class " + clazzStr1, ex);
+                        //throw new RuntimeException("Could not load class " + clazzStr1);
+                    }
+                    
+                    try {
+                        clazz2 = loader.loadClass(clazzStr2);
+                    } catch (ClassNotFoundException ex) {
+                        logger.log(Level.SEVERE, "Could not load class " + clazzStr2, ex);
+                        //throw new RuntimeException("Could not load class " + clazzStr2);
+                    }
+                    
+                    if (!sessionTid.equals(suppliedTid) && !((clazz1 == null || s.getClass().isAssignableFrom(clazz1)) || (clazz2 == null || s.getClass().isAssignableFrom(clazz2)))) {
+                        logger.log(Level.SEVERE, "The session tenant id does not match the supplied tenant id - {0}", suppliedTid);
+                        throw new RuntimeException("The session tenant id does not match the supplied tenant id - " + suppliedTid);
+                    }
+                }
             }
             
             if (!__entityManager.contains(s)) {
@@ -348,7 +344,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
     }
 
 
-    
+    @Override
     @Transactional
     public <S extends T> List<S> saveAll(Iterable<S> itrbl) {
         
@@ -377,7 +373,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(list);
     }
 
-    
+    @Override
     @Transactional
     public void flush() {
         if (__entityManager == null)
@@ -385,7 +381,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         __entityManager.flush();
     }
 
-    
+    @Override
     @Transactional
     public <S extends T> S saveAndFlush(S s) {
         
@@ -398,20 +394,20 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(s);
     }
 
-    
+    @Override
     @Transactional
     public void deleteInBatch(Iterable<T> itrbl) {
         deleteAll(itrbl);
     }
 
-    
+    @Override
     @Transactional
     public void deleteAllInBatch() {
         deleteAll();
     }
 
-    
-    @Transactional(readOnly=true)
+    @Override
+    @Transactional(readOnly=true, noRollbackFor={javax.persistence.NoResultException.class})
     public T getOne(ID id) {
         
         if (__entityManager == null)
@@ -447,8 +443,8 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(bean);
     }
 
-    
-    @Transactional(readOnly=true)
+    @Override
+    @Transactional(readOnly=true, noRollbackFor={javax.persistence.NoResultException.class})
     public Page<T> findAll(Pageable pgbl) {
         
         if (__entityManager == null)
@@ -503,13 +499,18 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(page);
     }
     
-    
+    @Override
+    @Transactional(readOnly=true, noRollbackFor={javax.persistence.NoResultException.class})
     public Optional<T> findById(ID id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        T bean = getOne(id);
+        Optional<T> opt = Optional.ofNullable(bean);
+        
+        return(opt);
     }
 
     
-    
+    @Override
     @Transactional(readOnly=true, noRollbackFor={javax.persistence.NoResultException.class})
     public <S extends T> Optional<S> findOne(Example<S> exmpl) {
         
@@ -520,7 +521,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(opt);
     }
 
-    //
+    //@Override
     public boolean exists(ID id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -528,7 +529,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
     /*
     * Hibernate OGM does not support Criteria Queries. Hence re-written as simple JPQL 
     * 
-    
+    @Override
     public long count() {
         
         if (__entityManager == null)
@@ -646,12 +647,12 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(list);
     }
     
-    
+    @Override
     public boolean existsById(ID id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    
+    @Override
     @Transactional(readOnly=true)
     public long count() {
         
@@ -709,7 +710,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
     }
     
     
-    
+    @Override
     @Transactional
     public void deleteById(ID id) {
         
@@ -728,7 +729,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         
     }
 
-    
+    @Override
     @Transactional
     public void delete(T entity) {
         
@@ -756,7 +757,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
     }
     
     
-    
+    @Override
     @Transactional
     public void deleteAll(Iterable<? extends T> itrbl) {
         
@@ -782,7 +783,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         logger.log(Level.FINEST, "Number of records affected - {0}", i);
     }
 
-    
+    @Override
     @Transactional
     public void deleteAll() {
         
@@ -811,20 +812,20 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         logger.log(Level.FINEST, "Number of records affected - {0}", i);
     }
     
-    //
+    //@Override
     public void detach(T entity) {
         if (__entityManager.contains(entity))
             __entityManager.detach(entity);
     }
     
-    //
+    //@Override
     public boolean isManaged(T entity) {
         boolean result = __entityManager.contains(entity);
         return(result);
     }
     
     /*
-    //
+    //@Override
     @Transactional(readOnly=true)
     public List<T> findText(String keywords, boolean fuzzy, Sort sortCriteria) {
         
@@ -843,7 +844,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(result);
     }
     
-    //
+    //@Override
     public Page<T> findText(String keywords, boolean fuzzy, Pageable pgbl) {
         
         Logger logger = Logger.getLogger(getClass().getName());
@@ -877,7 +878,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         
     }
     
-    
+    @Override
     @Transactional(readOnly=true)
     public List<T> findText(SearchCriteriaBean search, Sort sort) {
         
@@ -886,7 +887,7 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, ID extends Se
         return(null);
     }
     
-    
+    @Override
     @Transactional(readOnly=true)
     public Page<T> findText(SearchCriteriaBean search, Pageable pgbl) {
         
