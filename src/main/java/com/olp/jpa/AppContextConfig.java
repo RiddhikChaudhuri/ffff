@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 //@ComponentScan("com.olp")
 //@EnableLoadTimeWeaving
 @SpringBootApplication
+@ImportResource({"classpath*:applicationContext.xml"})
 //@ImportResource("classpath:applicationContext.xml")
 public class AppContextConfig {
     
